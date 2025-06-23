@@ -23,10 +23,6 @@ export async function POST(req) {
         const base64 = Buffer.from(arrayBuffer).toString('base64')
         const mimeType = file.type
         const dataUri = `data:${mimeType};base64,${base64}`
-
-        const tmpPath = path.join(tmpDir, nanoid() + '.jpg')
-        await fs.writeFile(tmpPath, buffer)
-
         const result = await cloudinary.uploader.upload(dataUri, {
             folder: 'products',
         })
