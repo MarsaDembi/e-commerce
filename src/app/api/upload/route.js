@@ -19,20 +19,17 @@ export async function POST(req) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
         }
 
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
-
-        const tmpDir = path.join(process.cwd(), 'tmp')
-        await fs.mkdir(tmpDir, { recursive: true })
+        const arrayBuffer = await file.arrayBuffer()
+        const base64 = Buffer.from(arrayBuffer).toString('base64')
+        const mimeType = file.type
+        const dataUri = `data:${mimeType};base64,${base64}`
 
         const tmpPath = path.join(tmpDir, nanoid() + '.jpg')
         await fs.writeFile(tmpPath, buffer)
 
-        const result = await cloudinary.uploader.upload(tmpPath, {
-            folder: 'ecommerce-app',
+        const result = await cloudinary.uploader.upload(dataUri, {
+            folder: 'products',
         })
-
-        await fs.unlink(tmpPath)
 
         return NextResponse.json({ url: result.secure_url })
     } catch (error) {
